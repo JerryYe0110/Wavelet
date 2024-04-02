@@ -1,0 +1,48 @@
+datasets:
+  val:
+    dataroot_gt: dataset/test/Test2800/target
+    dataroot_lq: dataset/test/Test2800/input
+    io_backend:
+      type: disk
+    name: SIDD_val
+    type: PairedImageDataset
+dist_params:
+  backend: nccl
+  port: 29500
+manual_seed: 10
+model_type: ImageRestorationModel
+name: WaveletNet-Rain13k-width32_VanillaAttention_LocalConvNext_True
+network_g:
+  G: VanillaAttention
+  L: LocalConvNext
+  S: true
+  dec_blk_nums:
+  - 4
+  - 4
+  - 6
+  enc_blk_nums:
+  - 4
+  - 4
+  - 6
+  middle_blk_num: 8
+  type: WaveletNet
+  width: 32
+num_gpu: 1
+path:
+  pretrain_network_g: experiments/WaveletNet-Rain13k-width32_VanillaAttention_LocalConvNext_True/models/net_g_300000.pth
+  resume_state: null
+  strict_load_g: false
+scale: 1
+val:
+  grids: false
+  metrics:
+    psnr:
+      crop_border: 0
+      test_y_channel: false
+      type: calculate_psnr
+    ssim:
+      crop_border: 0
+      test_y_channel: false
+      type: calculate_ssim
+  save_img: false
+  use_image: false

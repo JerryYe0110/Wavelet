@@ -1,0 +1,131 @@
+2023-01-25 16:42:06,124 INFO: 
+                ____                _       _____  ____
+               / __ ) ____ _ _____ (_)_____/ ___/ / __ \
+              / __  |/ __ `// ___// // ___/\__ \ / /_/ /
+             / /_/ // /_/ /(__  )/ // /__ ___/ // _, _/
+            /_____/ \__,_//____//_/ \___//____//_/ |_|
+     ______                   __   __                 __      __
+    / ____/____   ____   ____/ /  / /   __  __ _____ / /__   / /
+   / / __ / __ \ / __ \ / __  /  / /   / / / // ___// //_/  / /
+  / /_/ // /_/ // /_/ // /_/ /  / /___/ /_/ // /__ / /<    /_/
+  \____/ \____/ \____/ \____/  /_____/\____/ \___//_/|_|  (_)
+    
+Version Information: 
+	BasicSR: 1.2.0+f508600
+	PyTorch: 1.8.1
+	TorchVision: 0.2.2
+2023-01-25 16:42:06,125 INFO: 
+  name: WaveletNet-SIDD-width32_ConvNeXt_Cswin
+  model_type: ImageRestorationModel
+  scale: 1
+  num_gpu: 2
+  manual_seed: 10
+  datasets:[
+    train:[
+      name: SIDD
+      type: PairedImageDataset
+      dataroot_gt: ./data/SIDD/train/gt_crops.lmdb
+      dataroot_lq: ./data/SIDD/train/input_crops.lmdb
+      filename_tmpl: {}
+      io_backend:[
+        type: lmdb
+      ]
+      gt_size: 256
+      use_flip: False
+      use_rot: False
+      use_shuffle: True
+      num_worker_per_gpu: 12
+      batch_size_per_gpu: 12
+      dataset_enlarge_ratio: 1
+      prefetch_mode: None
+      phase: train
+      scale: 1
+    ]
+    val:[
+      name: SIDD_val
+      type: PairedImageDataset
+      dataroot_gt: ./data/SIDD/val/gt_crops.lmdb
+      dataroot_lq: ./data/SIDD/val/input_crops.lmdb
+      io_backend:[
+        type: lmdb
+      ]
+      phase: val
+      scale: 1
+    ]
+  ]
+  network_g:[
+    type: NeoUnet
+    mode: ConvNext
+    width: 32
+    enc_blk_nums: [6, 6, 4, 2]
+    middle_blk_num: 8
+    dec_blk_nums: [6, 6, 4, 2]
+  ]
+  path:[
+    pretrain_network_g: None
+    strict_load_g: True
+    resume_state: None
+    root: /home/jerry/Desktop/wavelet-transformer
+    experiments_root: /home/jerry/Desktop/wavelet-transformer/experiments/WaveletNet-SIDD-width32_ConvNeXt_Cswin
+    models: /home/jerry/Desktop/wavelet-transformer/experiments/WaveletNet-SIDD-width32_ConvNeXt_Cswin/models
+    training_states: /home/jerry/Desktop/wavelet-transformer/experiments/WaveletNet-SIDD-width32_ConvNeXt_Cswin/training_states
+    log: /home/jerry/Desktop/wavelet-transformer/experiments/WaveletNet-SIDD-width32_ConvNeXt_Cswin
+    visualization: /home/jerry/Desktop/wavelet-transformer/experiments/WaveletNet-SIDD-width32_ConvNeXt_Cswin/visualization
+  ]
+  train:[
+    optim_g:[
+      type: AdamW
+      lr: 0.0003
+      weight_decay: 0.0001
+      betas: [0.9, 0.999]
+    ]
+    scheduler:[
+      type: CosineAnnealingRestartCyclicLR
+      periods: [70000, 230000]
+      restart_weights: [1, 1]
+      eta_mins: [0.0003, 1e-07]
+    ]
+    total_iter: 300000
+    warmup_iter: -1
+    pixel_opt:[
+      type: PSNRLoss
+      loss_weight: 1
+      reduction: mean
+    ]
+  ]
+  val:[
+    val_freq: 20000.0
+    save_img: False
+    use_image: False
+    metrics:[
+      psnr:[
+        type: calculate_psnr
+        crop_border: 0
+        test_y_channel: False
+      ]
+      ssim:[
+        type: calculate_ssim
+        crop_border: 0
+        test_y_channel: False
+      ]
+    ]
+  ]
+  logger:[
+    print_freq: 200
+    save_checkpoint_freq: 5000.0
+    use_tb_logger: True
+    wandb:[
+      project: NeoUnet-SIDD-ConvNext
+      resume_id: None
+    ]
+  ]
+  dist_params:[
+    backend: nccl
+    port: 29500
+  ]
+  is_train: True
+  dist: False
+  rank: 0
+  world_size: 1
+
+2023-01-25 16:42:11,396 INFO: Use wandb logger with id=2wafteq3; project=NeoUnet-SIDD-ConvNext.

@@ -1,0 +1,276 @@
+2022-11-02 02:10:13,021 INFO: 
+                ____                _       _____  ____
+               / __ ) ____ _ _____ (_)_____/ ___/ / __ \
+              / __  |/ __ `// ___// // ___/\__ \ / /_/ /
+             / /_/ // /_/ /(__  )/ // /__ ___/ // _, _/
+            /_____/ \__,_//____//_/ \___//____//_/ |_|
+     ______                   __   __                 __      __
+    / ____/____   ____   ____/ /  / /   __  __ _____ / /__   / /
+   / / __ / __ \ / __ \ / __  /  / /   / / / // ___// //_/  / /
+  / /_/ // /_/ // /_/ // /_/ /  / /___/ /_/ // /__ / /<    /_/
+  \____/ \____/ \____/ \____/  /_____/\____/ \___//_/|_|  (_)
+    
+Version Information: 
+	BasicSR: 1.2.0+858f1c2
+	PyTorch: 1.12.1
+	TorchVision: 0.13.1
+2022-11-02 02:10:13,021 INFO: 
+  name: WaveletNet-Rain13k-width32_VanillaAttention_LocalConvNext_True_MIX
+  model_type: ImageRestorationModel
+  scale: 1
+  num_gpu: 1
+  manual_seed: 10
+  datasets:[
+    train:[
+      name: TrainSet
+      type: PairedImageDataset
+      dataroot_gt: ./dataset/Rain13K/target
+      dataroot_lq: ./dataset/Rain13K/input
+      geometric_augs: True
+      filename_tmpl: {}
+      io_backend:[
+        type: disk
+      ]
+      gt_size: 256
+      use_flip: False
+      use_rot: False
+      use_shuffle: True
+      num_worker_per_gpu: 8
+      batch_size_per_gpu: 8
+      dataset_enlarge_ratio: 1
+      prefetch_mode: None
+      phase: train
+      scale: 1
+    ]
+    val:[
+      name: ValSet
+      type: PairedImageDataset
+      dataroot_gt: ./dataset/test/Test1200/target
+      dataroot_lq: ./dataset/test/Test1200/input
+      io_backend:[
+        type: disk
+      ]
+      phase: val
+      scale: 1
+    ]
+  ]
+  network_g:[
+    type: WaveletNet
+    width: 32
+    enc_blk_nums: [4, 4, 6]
+    middle_blk_num: 8
+    dec_blk_nums: [4, 4, 6]
+    G: VanillaAttention
+    L: LocalConvNeXt
+    S: True
+  ]
+  path:[
+    pretrain_network_g: None
+    strict_load_g: True
+    resume_state: experiments/WaveletNet-Rain13k-width32_VanillaAttention_LocalConvNext_True_MIX/training_states/225000.state
+    root: /home/weishao/Projects/CVPR_2022/wavelet-transformer
+    experiments_root: /home/weishao/Projects/CVPR_2022/wavelet-transformer/experiments/WaveletNet-Rain13k-width32_VanillaAttention_LocalConvNext_True_MIX
+    models: /home/weishao/Projects/CVPR_2022/wavelet-transformer/experiments/WaveletNet-Rain13k-width32_VanillaAttention_LocalConvNext_True_MIX/models
+    training_states: /home/weishao/Projects/CVPR_2022/wavelet-transformer/experiments/WaveletNet-Rain13k-width32_VanillaAttention_LocalConvNext_True_MIX/training_states
+    log: /home/weishao/Projects/CVPR_2022/wavelet-transformer/experiments/WaveletNet-Rain13k-width32_VanillaAttention_LocalConvNext_True_MIX
+    visualization: /home/weishao/Projects/CVPR_2022/wavelet-transformer/experiments/WaveletNet-Rain13k-width32_VanillaAttention_LocalConvNext_True_MIX/visualization
+  ]
+  train:[
+    optim_g:[
+      type: AdamW
+      lr: 0.0003
+      weight_decay: 0.0001
+      betas: [0.9, 0.999]
+    ]
+    scheduler:[
+      type: CosineAnnealingRestartCyclicLR
+      periods: [70000, 230000]
+      restart_weights: [1, 1]
+      eta_mins: [0.0003, 1e-07]
+    ]
+    total_iter: 300000
+    warmup_iter: -1
+    pixel_opt:[
+      type: PSNRLoss
+      loss_weight: 1
+      reduction: mean
+    ]
+  ]
+  val:[
+    val_freq: 20000.0
+    save_img: False
+    use_image: False
+    metrics:[
+      psnr:[
+        type: calculate_psnr
+        crop_border: 0
+        test_y_channel: False
+      ]
+      ssim:[
+        type: calculate_ssim
+        crop_border: 0
+        test_y_channel: False
+      ]
+    ]
+  ]
+  logger:[
+    print_freq: 200
+    save_checkpoint_freq: 5000.0
+    use_tb_logger: True
+    wandb:[
+      project: None
+      resume_id: None
+    ]
+  ]
+  dist_params:[
+    backend: nccl
+    port: 29500
+  ]
+  is_train: True
+  dist: False
+  rank: 0
+  world_size: 1
+
+2022-11-02 02:10:14,625 INFO: Dataset PairedImageDataset - TrainSet is created.
+2022-11-02 02:10:14,625 INFO: Training statistics:
+	Number of train images: 13711
+	Dataset enlarge ratio: 1
+	Batch size per gpu: 8
+	World size (gpu number): 1
+	Require iter number per epoch: 1714
+	Total epochs: 176; iters: 300000.
+2022-11-02 02:10:14,661 INFO: Dataset PairedImageDataset - ValSet is created.
+2022-11-02 02:10:14,661 INFO: Number of val images/folders in ValSet: 1200
+2022-11-02 02:10:14,661 INFO: Set pretrain_network_g to /home/weishao/Projects/CVPR_2022/wavelet-transformer/experiments/WaveletNet-Rain13k-width32_VanillaAttention_LocalConvNext_True_MIX/models/net_g_225000.pth
+2022-11-02 02:10:15,062 INFO: Loading WaveletNet model from /home/weishao/Projects/CVPR_2022/wavelet-transformer/experiments/WaveletNet-Rain13k-width32_VanillaAttention_LocalConvNext_True_MIX/models/net_g_225000.pth.
+2022-11-02 02:10:16,168 INFO: Model [ImageRestorationModel] is created.
+2022-11-02 02:10:16,477 INFO: Resuming training from epoch: 131, iter: 225000.
+2022-11-02 02:10:16,579 INFO: Start training from epoch: 131, iter: 225000
+2022-11-02 02:14:46,003 INFO: [Wavel..][epoch:131, iter: 225,200, lr:(3.000e-04,)] [eta: 1 day, 3:51:39, time (data): 1.326 (0.002)] l_pix: -3.3648e+01 
+2022-11-02 02:19:12,334 INFO: [Wavel..][epoch:131, iter: 225,400, lr:(3.000e-04,)] [eta: 1 day, 3:41:26, time (data): 1.329 (0.003)] l_pix: -3.2663e+01 
+2022-11-02 02:23:38,895 INFO: [Wavel..][epoch:131, iter: 225,600, lr:(3.000e-04,)] [eta: 1 day, 3:35:32, time (data): 1.325 (0.003)] l_pix: -3.2425e+01 
+2022-11-02 02:28:05,509 INFO: [Wavel..][epoch:131, iter: 225,800, lr:(3.000e-04,)] [eta: 1 day, 3:30:27, time (data): 1.336 (0.003)] l_pix: -3.2276e+01 
+2022-11-02 02:32:32,482 INFO: [Wavel..][epoch:131, iter: 226,000, lr:(3.000e-04,)] [eta: 1 day, 3:26:04, time (data): 1.337 (0.003)] l_pix: -3.3042e+01 
+2022-11-02 02:36:59,566 INFO: [Wavel..][epoch:131, iter: 226,200, lr:(3.000e-04,)] [eta: 1 day, 3:21:46, time (data): 1.335 (0.003)] l_pix: -3.2570e+01 
+2022-11-02 02:41:26,519 INFO: [Wavel..][epoch:131, iter: 226,400, lr:(3.000e-04,)] [eta: 1 day, 3:17:19, time (data): 1.336 (0.003)] l_pix: -3.3846e+01 
+2022-11-02 02:45:53,636 INFO: [Wavel..][epoch:131, iter: 226,600, lr:(3.000e-04,)] [eta: 1 day, 3:12:59, time (data): 1.333 (0.003)] l_pix: -3.3877e+01 
+2022-11-02 02:50:20,637 INFO: [Wavel..][epoch:132, iter: 226,800, lr:(3.000e-04,)] [eta: 1 day, 3:08:33, time (data): 1.336 (0.003)] l_pix: -3.2246e+01 
+2022-11-02 02:54:47,003 INFO: [Wavel..][epoch:132, iter: 227,000, lr:(3.000e-04,)] [eta: 1 day, 3:03:44, time (data): 1.333 (0.003)] l_pix: -3.1233e+01 
+2022-11-02 02:59:13,399 INFO: [Wavel..][epoch:132, iter: 227,200, lr:(3.000e-04,)] [eta: 1 day, 2:58:59, time (data): 1.333 (0.003)] l_pix: -3.2829e+01 
+2022-11-02 03:03:39,985 INFO: [Wavel..][epoch:132, iter: 227,400, lr:(3.000e-04,)] [eta: 1 day, 2:54:24, time (data): 1.333 (0.003)] l_pix: -3.1708e+01 
+2022-11-02 03:08:06,908 INFO: [Wavel..][epoch:132, iter: 227,600, lr:(3.000e-04,)] [eta: 1 day, 2:49:59, time (data): 1.334 (0.003)] l_pix: -3.3385e+01 
+2022-11-02 03:12:33,967 INFO: [Wavel..][epoch:132, iter: 227,800, lr:(3.000e-04,)] [eta: 1 day, 2:45:38, time (data): 1.335 (0.003)] l_pix: -3.3026e+01 
+2022-11-02 03:17:00,520 INFO: [Wavel..][epoch:132, iter: 228,000, lr:(3.000e-04,)] [eta: 1 day, 2:41:03, time (data): 1.339 (0.003)] l_pix: -3.2578e+01 
+2022-11-02 03:21:27,153 INFO: [Wavel..][epoch:132, iter: 228,200, lr:(3.000e-04,)] [eta: 1 day, 2:36:32, time (data): 1.331 (0.003)] l_pix: -3.0729e+01 
+2022-11-02 03:25:53,521 INFO: [Wavel..][epoch:132, iter: 228,400, lr:(3.000e-04,)] [eta: 1 day, 2:31:55, time (data): 1.326 (0.003)] l_pix: -3.3983e+01 
+2022-11-02 03:30:20,133 INFO: [Wavel..][epoch:133, iter: 228,600, lr:(3.000e-04,)] [eta: 1 day, 2:27:24, time (data): 1.335 (0.003)] l_pix: -3.2079e+01 
+2022-11-02 03:34:47,110 INFO: [Wavel..][epoch:133, iter: 228,800, lr:(3.000e-04,)] [eta: 1 day, 2:23:01, time (data): 1.325 (0.003)] l_pix: -3.4659e+01 
+2022-11-02 03:39:13,716 INFO: [Wavel..][epoch:133, iter: 229,000, lr:(3.000e-04,)] [eta: 1 day, 2:18:30, time (data): 1.325 (0.003)] l_pix: -3.5682e+01 
+2022-11-02 03:43:40,317 INFO: [Wavel..][epoch:133, iter: 229,200, lr:(3.000e-04,)] [eta: 1 day, 2:14:00, time (data): 1.339 (0.004)] l_pix: -3.4646e+01 
+2022-11-02 03:48:06,962 INFO: [Wavel..][epoch:133, iter: 229,400, lr:(3.000e-04,)] [eta: 1 day, 2:09:31, time (data): 1.331 (0.003)] l_pix: -3.0306e+01 
+2022-11-02 03:52:33,717 INFO: [Wavel..][epoch:133, iter: 229,600, lr:(3.000e-04,)] [eta: 1 day, 2:05:04, time (data): 1.323 (0.003)] l_pix: -3.1386e+01 
+2022-11-02 03:57:01,015 INFO: [Wavel..][epoch:133, iter: 229,800, lr:(3.000e-04,)] [eta: 1 day, 2:00:45, time (data): 1.342 (0.004)] l_pix: -3.2897e+01 
+2022-11-02 04:01:28,326 INFO: [Wavel..][epoch:133, iter: 230,000, lr:(3.000e-04,)] [eta: 1 day, 1:56:25, time (data): 1.342 (0.004)] l_pix: -3.4135e+01 
+2022-11-02 04:01:28,327 INFO: Saving models and training states.
+2022-11-02 04:05:56,274 INFO: [Wavel..][epoch:134, iter: 230,200, lr:(3.000e-04,)] [eta: 1 day, 1:52:14, time (data): 1.328 (0.003)] l_pix: -3.2123e+01 
+2022-11-02 04:10:22,960 INFO: [Wavel..][epoch:134, iter: 230,400, lr:(3.000e-04,)] [eta: 1 day, 1:47:45, time (data): 1.333 (0.003)] l_pix: -3.4178e+01 
+2022-11-02 04:14:50,033 INFO: [Wavel..][epoch:134, iter: 230,600, lr:(3.000e-04,)] [eta: 1 day, 1:43:20, time (data): 1.335 (0.003)] l_pix: -3.3132e+01 
+2022-11-02 04:19:17,252 INFO: [Wavel..][epoch:134, iter: 230,800, lr:(3.000e-04,)] [eta: 1 day, 1:38:58, time (data): 1.346 (0.003)] l_pix: -3.3216e+01 
+2022-11-02 04:23:44,135 INFO: [Wavel..][epoch:134, iter: 231,000, lr:(3.000e-04,)] [eta: 1 day, 1:34:31, time (data): 1.329 (0.003)] l_pix: -3.2828e+01 
+2022-11-02 04:28:10,767 INFO: [Wavel..][epoch:134, iter: 231,200, lr:(3.000e-04,)] [eta: 1 day, 1:30:01, time (data): 1.333 (0.003)] l_pix: -3.3462e+01 
+2022-11-02 04:32:37,498 INFO: [Wavel..][epoch:134, iter: 231,400, lr:(3.000e-04,)] [eta: 1 day, 1:25:33, time (data): 1.332 (0.003)] l_pix: -3.4025e+01 
+2022-11-02 04:37:04,250 INFO: [Wavel..][epoch:134, iter: 231,600, lr:(3.000e-04,)] [eta: 1 day, 1:21:05, time (data): 1.328 (0.003)] l_pix: -3.3228e+01 
+2022-11-02 04:41:30,671 INFO: [Wavel..][epoch:134, iter: 231,800, lr:(3.000e-04,)] [eta: 1 day, 1:16:34, time (data): 1.339 (0.003)] l_pix: -3.6020e+01 
+2022-11-02 04:45:57,344 INFO: [Wavel..][epoch:135, iter: 232,000, lr:(3.000e-04,)] [eta: 1 day, 1:12:05, time (data): 1.334 (0.003)] l_pix: -3.3143e+01 
+2022-11-02 04:50:23,938 INFO: [Wavel..][epoch:135, iter: 232,200, lr:(3.000e-04,)] [eta: 1 day, 1:07:36, time (data): 1.327 (0.003)] l_pix: -3.2108e+01 
+2022-11-02 04:54:50,309 INFO: [Wavel..][epoch:135, iter: 232,400, lr:(3.000e-04,)] [eta: 1 day, 1:03:05, time (data): 1.338 (0.003)] l_pix: -3.5330e+01 
+2022-11-02 04:59:17,021 INFO: [Wavel..][epoch:135, iter: 232,600, lr:(3.000e-04,)] [eta: 1 day, 0:58:37, time (data): 1.334 (0.003)] l_pix: -3.3638e+01 
+2022-11-02 05:03:43,562 INFO: [Wavel..][epoch:135, iter: 232,800, lr:(3.000e-04,)] [eta: 1 day, 0:54:08, time (data): 1.325 (0.003)] l_pix: -3.2983e+01 
+2022-11-02 05:08:09,639 INFO: [Wavel..][epoch:135, iter: 233,000, lr:(3.000e-04,)] [eta: 1 day, 0:49:35, time (data): 1.333 (0.003)] l_pix: -3.2156e+01 
+2022-11-02 05:12:35,836 INFO: [Wavel..][epoch:135, iter: 233,200, lr:(3.000e-04,)] [eta: 1 day, 0:45:03, time (data): 1.323 (0.003)] l_pix: -3.4301e+01 
+2022-11-02 05:17:02,067 INFO: [Wavel..][epoch:135, iter: 233,400, lr:(3.000e-04,)] [eta: 1 day, 0:40:32, time (data): 1.327 (0.003)] l_pix: -3.3333e+01 
+2022-11-02 05:21:28,765 INFO: [Wavel..][epoch:136, iter: 233,600, lr:(3.000e-04,)] [eta: 1 day, 0:36:05, time (data): 1.326 (0.003)] l_pix: -3.3319e+01 
+2022-11-02 05:25:55,246 INFO: [Wavel..][epoch:136, iter: 233,800, lr:(3.000e-04,)] [eta: 1 day, 0:31:36, time (data): 1.323 (0.003)] l_pix: -3.2484e+01 
+2022-11-02 05:30:21,623 INFO: [Wavel..][epoch:136, iter: 234,000, lr:(3.000e-04,)] [eta: 1 day, 0:27:06, time (data): 1.336 (0.003)] l_pix: -3.3414e+01 
+2022-11-02 05:34:48,250 INFO: [Wavel..][epoch:136, iter: 234,200, lr:(3.000e-04,)] [eta: 1 day, 0:22:38, time (data): 1.327 (0.003)] l_pix: -3.2143e+01 
+2022-11-02 05:39:14,701 INFO: [Wavel..][epoch:136, iter: 234,400, lr:(3.000e-04,)] [eta: 1 day, 0:18:10, time (data): 1.326 (0.003)] l_pix: -3.4017e+01 
+2022-11-02 05:43:41,682 INFO: [Wavel..][epoch:136, iter: 234,600, lr:(3.000e-04,)] [eta: 1 day, 0:13:45, time (data): 1.334 (0.003)] l_pix: -3.2893e+01 
+2022-11-02 05:48:08,339 INFO: [Wavel..][epoch:136, iter: 234,800, lr:(3.000e-04,)] [eta: 1 day, 0:09:17, time (data): 1.336 (0.003)] l_pix: -3.2425e+01 
+2022-11-02 05:52:35,048 INFO: [Wavel..][epoch:136, iter: 235,000, lr:(3.000e-04,)] [eta: 1 day, 0:04:50, time (data): 1.337 (0.003)] l_pix: -3.3810e+01 
+2022-11-02 05:52:35,050 INFO: Saving models and training states.
+2022-11-02 05:57:03,023 INFO: [Wavel..][epoch:136, iter: 235,200, lr:(3.000e-04,)] [eta: 1 day, 0:00:31, time (data): 1.338 (0.003)] l_pix: -3.3781e+01 
+2022-11-02 06:01:29,718 INFO: [Wavel..][epoch:137, iter: 235,400, lr:(3.000e-04,)] [eta: 23:56:04, time (data): 1.329 (0.003)] l_pix: -3.3983e+01 
+2022-11-02 06:05:56,417 INFO: [Wavel..][epoch:137, iter: 235,600, lr:(3.000e-04,)] [eta: 23:51:37, time (data): 1.333 (0.003)] l_pix: -3.6298e+01 
+2022-11-02 06:10:22,814 INFO: [Wavel..][epoch:137, iter: 235,800, lr:(3.000e-04,)] [eta: 23:47:08, time (data): 1.327 (0.003)] l_pix: -3.1555e+01 
+2022-11-02 06:14:49,299 INFO: [Wavel..][epoch:137, iter: 236,000, lr:(3.000e-04,)] [eta: 23:42:40, time (data): 1.336 (0.003)] l_pix: -3.2307e+01 
+2022-11-02 06:19:16,244 INFO: [Wavel..][epoch:137, iter: 236,200, lr:(3.000e-04,)] [eta: 23:38:14, time (data): 1.334 (0.003)] l_pix: -3.2999e+01 
+2022-11-02 06:23:44,375 INFO: [Wavel..][epoch:137, iter: 236,400, lr:(3.000e-04,)] [eta: 23:33:55, time (data): 1.336 (0.003)] l_pix: -3.3656e+01 
+2022-11-02 06:28:12,540 INFO: [Wavel..][epoch:137, iter: 236,600, lr:(3.000e-04,)] [eta: 23:29:36, time (data): 1.328 (0.003)] l_pix: -3.3938e+01 
+2022-11-02 06:32:40,840 INFO: [Wavel..][epoch:137, iter: 236,800, lr:(3.000e-04,)] [eta: 23:25:17, time (data): 1.337 (0.003)] l_pix: -3.1440e+01 
+2022-11-02 06:37:07,266 INFO: [Wavel..][epoch:138, iter: 237,000, lr:(3.000e-04,)] [eta: 23:20:48, time (data): 1.332 (0.005)] l_pix: -3.4318e+01 
+2022-11-02 06:41:34,033 INFO: [Wavel..][epoch:138, iter: 237,200, lr:(3.000e-04,)] [eta: 23:16:21, time (data): 1.335 (0.003)] l_pix: -3.0757e+01 
+2022-11-02 06:46:00,874 INFO: [Wavel..][epoch:138, iter: 237,400, lr:(3.000e-04,)] [eta: 23:11:54, time (data): 1.329 (0.003)] l_pix: -3.2582e+01 
+2022-11-02 06:50:27,599 INFO: [Wavel..][epoch:138, iter: 237,600, lr:(3.000e-04,)] [eta: 23:07:27, time (data): 1.329 (0.003)] l_pix: -3.4418e+01 
+2022-11-02 06:54:54,191 INFO: [Wavel..][epoch:138, iter: 237,800, lr:(3.000e-04,)] [eta: 23:02:59, time (data): 1.331 (0.003)] l_pix: -3.3763e+01 
+2022-11-02 06:59:20,640 INFO: [Wavel..][epoch:138, iter: 238,000, lr:(3.000e-04,)] [eta: 22:58:30, time (data): 1.336 (0.003)] l_pix: -3.2539e+01 
+2022-11-02 07:03:47,653 INFO: [Wavel..][epoch:138, iter: 238,200, lr:(3.000e-04,)] [eta: 22:54:04, time (data): 1.330 (0.003)] l_pix: -3.1650e+01 
+2022-11-02 07:08:14,464 INFO: [Wavel..][epoch:138, iter: 238,400, lr:(3.000e-04,)] [eta: 22:49:37, time (data): 1.328 (0.003)] l_pix: -3.1887e+01 
+2022-11-02 07:12:41,307 INFO: [Wavel..][epoch:138, iter: 238,600, lr:(3.000e-04,)] [eta: 22:45:11, time (data): 1.328 (0.003)] l_pix: -3.2033e+01 
+2022-11-02 07:17:08,124 INFO: [Wavel..][epoch:139, iter: 238,800, lr:(3.000e-04,)] [eta: 22:40:44, time (data): 1.323 (0.003)] l_pix: -3.1175e+01 
+2022-11-02 07:21:34,597 INFO: [Wavel..][epoch:139, iter: 239,000, lr:(3.000e-04,)] [eta: 22:36:16, time (data): 1.333 (0.003)] l_pix: -3.2853e+01 
+2022-11-02 07:26:01,467 INFO: [Wavel..][epoch:139, iter: 239,200, lr:(3.000e-04,)] [eta: 22:31:49, time (data): 1.331 (0.003)] l_pix: -3.4814e+01 
+2022-11-02 07:30:28,511 INFO: [Wavel..][epoch:139, iter: 239,400, lr:(3.000e-04,)] [eta: 22:27:23, time (data): 1.340 (0.003)] l_pix: -3.2078e+01 
+2022-11-02 07:34:55,185 INFO: [Wavel..][epoch:139, iter: 239,600, lr:(3.000e-04,)] [eta: 22:22:56, time (data): 1.330 (0.003)] l_pix: -3.1528e+01 
+2022-11-02 07:39:21,805 INFO: [Wavel..][epoch:139, iter: 239,800, lr:(3.000e-04,)] [eta: 22:18:28, time (data): 1.328 (0.003)] l_pix: -3.2800e+01 
+2022-11-02 07:43:48,615 INFO: [Wavel..][epoch:139, iter: 240,000, lr:(3.000e-04,)] [eta: 22:14:01, time (data): 1.341 (0.003)] l_pix: -3.3366e+01 
+2022-11-02 07:43:48,616 INFO: Saving models and training states.
+2022-11-02 07:43:49,886 WARNING: nondist_validation is not implemented. Run dist_validation.
+2022-11-02 07:55:08,740 INFO: Validation ValSet, 		 # psnr: 30.7729	 # ssim: 0.9276
+2022-11-02 07:55:08,741 INFO: [Wavel..][epoch:139, iter: 240,000, lr:(3.000e-04,)] m_psnr: 3.0773e+01 m_ssim: 9.2762e-01 
+2022-11-02 07:59:41,128 INFO: [Wavel..][epoch:139, iter: 240,200, lr:(3.000e-04,)] [eta: 22:54:32, time (data): 1.358 (0.004)] l_pix: -3.2402e+01 
+2022-11-02 08:04:12,819 INFO: [Wavel..][epoch:139, iter: 240,400, lr:(3.000e-04,)] [eta: 22:49:40, time (data): 1.350 (0.004)] l_pix: -3.2256e+01 
+2022-11-02 08:08:44,359 INFO: [Wavel..][epoch:140, iter: 240,600, lr:(3.000e-04,)] [eta: 22:44:48, time (data): 1.355 (0.006)] l_pix: -3.4443e+01 
+2022-11-02 08:13:15,744 INFO: [Wavel..][epoch:140, iter: 240,800, lr:(3.000e-04,)] [eta: 22:39:56, time (data): 1.349 (0.004)] l_pix: -3.3635e+01 
+2022-11-02 08:17:46,974 INFO: [Wavel..][epoch:140, iter: 241,000, lr:(3.000e-04,)] [eta: 22:35:04, time (data): 1.351 (0.003)] l_pix: -3.3391e+01 
+2022-11-02 08:22:18,439 INFO: [Wavel..][epoch:140, iter: 241,200, lr:(3.000e-04,)] [eta: 22:30:14, time (data): 1.352 (0.004)] l_pix: -3.4907e+01 
+2022-11-02 08:26:50,036 INFO: [Wavel..][epoch:140, iter: 241,400, lr:(3.000e-04,)] [eta: 22:25:24, time (data): 1.357 (0.004)] l_pix: -3.2685e+01 
+2022-11-02 08:31:21,586 INFO: [Wavel..][epoch:140, iter: 241,600, lr:(3.000e-04,)] [eta: 22:20:34, time (data): 1.364 (0.004)] l_pix: -3.4273e+01 
+2022-11-02 08:35:52,911 INFO: [Wavel..][epoch:140, iter: 241,800, lr:(3.000e-04,)] [eta: 22:15:45, time (data): 1.360 (0.005)] l_pix: -3.1588e+01 
+2022-11-02 08:40:24,388 INFO: [Wavel..][epoch:140, iter: 242,000, lr:(3.000e-04,)] [eta: 22:10:56, time (data): 1.360 (0.004)] l_pix: -3.1817e+01 
+2022-11-02 08:44:56,395 INFO: [Wavel..][epoch:141, iter: 242,200, lr:(3.000e-04,)] [eta: 22:06:09, time (data): 1.359 (0.004)] l_pix: -3.2958e+01 
+2022-11-02 08:49:28,620 INFO: [Wavel..][epoch:141, iter: 242,400, lr:(3.000e-04,)] [eta: 22:01:23, time (data): 1.363 (0.004)] l_pix: -3.2360e+01 
+2022-11-02 08:54:00,776 INFO: [Wavel..][epoch:141, iter: 242,600, lr:(3.000e-04,)] [eta: 21:56:38, time (data): 1.356 (0.003)] l_pix: -3.3921e+01 
+2022-11-02 08:58:32,831 INFO: [Wavel..][epoch:141, iter: 242,800, lr:(3.000e-04,)] [eta: 21:51:52, time (data): 1.363 (0.003)] l_pix: -3.1541e+01 
+2022-11-02 09:03:04,818 INFO: [Wavel..][epoch:141, iter: 243,000, lr:(3.000e-04,)] [eta: 21:47:07, time (data): 1.367 (0.004)] l_pix: -3.3518e+01 
+2022-11-02 09:07:36,890 INFO: [Wavel..][epoch:141, iter: 243,200, lr:(3.000e-04,)] [eta: 21:42:22, time (data): 1.363 (0.003)] l_pix: -3.2415e+01 
+2022-11-02 09:12:08,377 INFO: [Wavel..][epoch:141, iter: 243,400, lr:(3.000e-04,)] [eta: 21:37:35, time (data): 1.359 (0.003)] l_pix: -3.2931e+01 
+2022-11-02 09:16:40,377 INFO: [Wavel..][epoch:141, iter: 243,600, lr:(3.000e-04,)] [eta: 21:32:51, time (data): 1.356 (0.003)] l_pix: -3.1730e+01 
+2022-11-02 09:21:13,836 INFO: [Wavel..][epoch:141, iter: 243,800, lr:(3.000e-04,)] [eta: 21:28:11, time (data): 1.354 (0.004)] l_pix: -3.3076e+01 
+2022-11-02 09:25:47,444 INFO: [Wavel..][epoch:142, iter: 244,000, lr:(3.000e-04,)] [eta: 21:23:32, time (data): 1.349 (0.004)] l_pix: -3.0649e+01 
+2022-11-02 09:30:19,555 INFO: [Wavel..][epoch:142, iter: 244,200, lr:(3.000e-04,)] [eta: 21:18:48, time (data): 1.355 (0.005)] l_pix: -3.4732e+01 
+2022-11-02 09:34:51,605 INFO: [Wavel..][epoch:142, iter: 244,400, lr:(3.000e-04,)] [eta: 21:14:05, time (data): 1.349 (0.004)] l_pix: -3.5078e+01 
+2022-11-02 09:39:23,548 INFO: [Wavel..][epoch:142, iter: 244,600, lr:(3.000e-04,)] [eta: 21:09:21, time (data): 1.362 (0.004)] l_pix: -3.2539e+01 
+2022-11-02 09:43:55,782 INFO: [Wavel..][epoch:142, iter: 244,800, lr:(3.000e-04,)] [eta: 21:04:38, time (data): 1.367 (0.004)] l_pix: -3.1346e+01 
+2022-11-02 09:48:27,884 INFO: [Wavel..][epoch:142, iter: 245,000, lr:(3.000e-04,)] [eta: 20:59:56, time (data): 1.355 (0.004)] l_pix: -3.5700e+01 
+2022-11-02 09:48:27,885 INFO: Saving models and training states.
+2022-11-02 09:53:01,196 INFO: [Wavel..][epoch:142, iter: 245,200, lr:(3.000e-04,)] [eta: 20:55:17, time (data): 1.366 (0.004)] l_pix: -3.2742e+01 
+2022-11-02 09:57:33,098 INFO: [Wavel..][epoch:142, iter: 245,400, lr:(3.000e-04,)] [eta: 20:50:34, time (data): 1.371 (0.006)] l_pix: -3.3066e+01 
+2022-11-02 10:02:05,014 INFO: [Wavel..][epoch:143, iter: 245,600, lr:(3.000e-04,)] [eta: 20:45:51, time (data): 1.355 (0.004)] l_pix: -3.3788e+01 
+2022-11-02 10:06:36,454 INFO: [Wavel..][epoch:143, iter: 245,800, lr:(3.000e-04,)] [eta: 20:41:07, time (data): 1.353 (0.004)] l_pix: -3.0858e+01 
+2022-11-02 10:11:07,951 INFO: [Wavel..][epoch:143, iter: 246,000, lr:(3.000e-04,)] [eta: 20:36:24, time (data): 1.354 (0.004)] l_pix: -3.3674e+01 
+2022-11-02 10:15:39,521 INFO: [Wavel..][epoch:143, iter: 246,200, lr:(3.000e-04,)] [eta: 20:31:41, time (data): 1.355 (0.005)] l_pix: -3.3600e+01 
+2022-11-02 10:20:11,001 INFO: [Wavel..][epoch:143, iter: 246,400, lr:(3.000e-04,)] [eta: 20:26:58, time (data): 1.355 (0.004)] l_pix: -3.3095e+01 
+2022-11-02 10:24:42,740 INFO: [Wavel..][epoch:143, iter: 246,600, lr:(3.000e-04,)] [eta: 20:22:16, time (data): 1.348 (0.004)] l_pix: -3.3964e+01 
+2022-11-02 10:29:12,950 INFO: [Wavel..][epoch:143, iter: 246,800, lr:(3.000e-04,)] [eta: 20:17:31, time (data): 1.350 (0.004)] l_pix: -3.2234e+01 
+2022-11-02 10:33:44,577 INFO: [Wavel..][epoch:143, iter: 247,000, lr:(3.000e-04,)] [eta: 20:12:49, time (data): 1.355 (0.004)] l_pix: -3.2737e+01 
+2022-11-02 10:38:16,214 INFO: [Wavel..][epoch:143, iter: 247,200, lr:(3.000e-04,)] [eta: 20:08:07, time (data): 1.347 (0.004)] l_pix: -3.2743e+01 
+2022-11-02 10:42:48,818 INFO: [Wavel..][epoch:144, iter: 247,400, lr:(3.000e-04,)] [eta: 20:03:28, time (data): 1.361 (0.003)] l_pix: -3.2579e+01 
+2022-11-02 10:47:20,554 INFO: [Wavel..][epoch:144, iter: 247,600, lr:(3.000e-04,)] [eta: 19:58:47, time (data): 1.359 (0.004)] l_pix: -3.2590e+01 
+2022-11-02 10:51:52,053 INFO: [Wavel..][epoch:144, iter: 247,800, lr:(3.000e-04,)] [eta: 19:54:05, time (data): 1.362 (0.004)] l_pix: -3.6420e+01 
+2022-11-02 10:56:23,902 INFO: [Wavel..][epoch:144, iter: 248,000, lr:(3.000e-04,)] [eta: 19:49:25, time (data): 1.359 (0.004)] l_pix: -3.5130e+01 
+2022-11-02 11:00:54,962 INFO: [Wavel..][epoch:144, iter: 248,200, lr:(3.000e-04,)] [eta: 19:44:43, time (data): 1.347 (0.004)] l_pix: -3.2837e+01 
+2022-11-02 11:05:26,386 INFO: [Wavel..][epoch:144, iter: 248,400, lr:(3.000e-04,)] [eta: 19:40:02, time (data): 1.338 (0.004)] l_pix: -3.4848e+01 
+2022-11-02 11:09:58,611 INFO: [Wavel..][epoch:144, iter: 248,600, lr:(3.000e-04,)] [eta: 19:35:22, time (data): 1.360 (0.003)] l_pix: -3.4533e+01 
+2022-11-02 11:14:30,697 INFO: [Wavel..][epoch:144, iter: 248,800, lr:(3.000e-04,)] [eta: 19:30:43, time (data): 1.359 (0.004)] l_pix: -3.2644e+01 
+2022-11-02 11:19:02,938 INFO: [Wavel..][epoch:145, iter: 249,000, lr:(3.000e-04,)] [eta: 19:26:04, time (data): 1.363 (0.003)] l_pix: -3.4726e+01 
+2022-11-02 11:23:34,981 INFO: [Wavel..][epoch:145, iter: 249,200, lr:(3.000e-04,)] [eta: 19:21:25, time (data): 1.363 (0.004)] l_pix: -3.3484e+01 

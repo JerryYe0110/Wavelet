@@ -1,0 +1,711 @@
+2022-10-29 12:19:48,462 INFO: 
+                ____                _       _____  ____
+               / __ ) ____ _ _____ (_)_____/ ___/ / __ \
+              / __  |/ __ `// ___// // ___/\__ \ / /_/ /
+             / /_/ // /_/ /(__  )/ // /__ ___/ // _, _/
+            /_____/ \__,_//____//_/ \___//____//_/ |_|
+     ______                   __   __                 __      __
+    / ____/____   ____   ____/ /  / /   __  __ _____ / /__   / /
+   / / __ / __ \ / __ \ / __  /  / /   / / / // ___// //_/  / /
+  / /_/ // /_/ // /_/ // /_/ /  / /___/ /_/ // /__ / /<    /_/
+  \____/ \____/ \____/ \____/  /_____/\____/ \___//_/|_|  (_)
+    
+Version Information: 
+	BasicSR: 1.2.0+858f1c2
+	PyTorch: 1.12.1
+	TorchVision: 0.13.1
+2022-10-29 12:19:48,463 INFO: 
+  name: WaveletNet-Rain13k-width32_VanillaAttention_LocalConvNext_True
+  model_type: ImageRestorationModel
+  scale: 1
+  num_gpu: 1
+  manual_seed: 10
+  datasets:[
+    train:[
+      name: TrainSet
+      type: PairedImageDataset
+      dataroot_gt: ./dataset/Rain13K/target
+      dataroot_lq: ./dataset/Rain13K/input
+      geometric_augs: True
+      filename_tmpl: {}
+      io_backend:[
+        type: disk
+      ]
+      gt_size: 256
+      use_flip: False
+      use_rot: False
+      use_shuffle: True
+      num_worker_per_gpu: 8
+      batch_size_per_gpu: 8
+      dataset_enlarge_ratio: 1
+      prefetch_mode: None
+      phase: train
+      scale: 1
+    ]
+    val:[
+      name: ValSet
+      type: PairedImageDataset
+      dataroot_gt: ./dataset/test/Test1200/target
+      dataroot_lq: ./dataset/test/Test1200/input
+      io_backend:[
+        type: disk
+      ]
+      phase: val
+      scale: 1
+    ]
+  ]
+  network_g:[
+    type: WaveletNet
+    width: 32
+    enc_blk_nums: [4, 4, 6]
+    middle_blk_num: 8
+    dec_blk_nums: [4, 4, 6]
+    G: VanillaAttention
+    L: LocalConvNeXt
+    S: True
+  ]
+  path:[
+    pretrain_network_g: None
+    strict_load_g: True
+    resume_state: experiments/WaveletNet-Rain13k-width32_VanillaAttention_LocalConvNext_True/training_states/160000.state
+    root: /home/weishao/Projects/CVPR_2022/wavelet-transformer
+    experiments_root: /home/weishao/Projects/CVPR_2022/wavelet-transformer/experiments/WaveletNet-Rain13k-width32_VanillaAttention_LocalConvNext_True
+    models: /home/weishao/Projects/CVPR_2022/wavelet-transformer/experiments/WaveletNet-Rain13k-width32_VanillaAttention_LocalConvNext_True/models
+    training_states: /home/weishao/Projects/CVPR_2022/wavelet-transformer/experiments/WaveletNet-Rain13k-width32_VanillaAttention_LocalConvNext_True/training_states
+    log: /home/weishao/Projects/CVPR_2022/wavelet-transformer/experiments/WaveletNet-Rain13k-width32_VanillaAttention_LocalConvNext_True
+    visualization: /home/weishao/Projects/CVPR_2022/wavelet-transformer/experiments/WaveletNet-Rain13k-width32_VanillaAttention_LocalConvNext_True/visualization
+  ]
+  train:[
+    optim_g:[
+      type: AdamW
+      lr: 0.0003
+      weight_decay: 0.0001
+      betas: [0.9, 0.999]
+    ]
+    scheduler:[
+      type: CosineAnnealingRestartCyclicLR
+      periods: [70000, 330000]
+      restart_weights: [1, 1]
+      eta_mins: [0.0003, 1e-07]
+    ]
+    total_iter: 400000
+    warmup_iter: -1
+    pixel_opt:[
+      type: PSNRLoss
+      loss_weight: 1
+      reduction: mean
+    ]
+  ]
+  val:[
+    val_freq: 20000.0
+    save_img: False
+    use_image: False
+    metrics:[
+      psnr:[
+        type: calculate_psnr
+        crop_border: 0
+        test_y_channel: False
+      ]
+      ssim:[
+        type: calculate_ssim
+        crop_border: 0
+        test_y_channel: False
+      ]
+    ]
+  ]
+  logger:[
+    print_freq: 200
+    save_checkpoint_freq: 5000.0
+    use_tb_logger: True
+    wandb:[
+      project: None
+      resume_id: None
+    ]
+  ]
+  dist_params:[
+    backend: nccl
+    port: 29500
+  ]
+  is_train: True
+  dist: False
+  rank: 0
+  world_size: 1
+
+2022-10-29 12:19:49,966 INFO: Dataset PairedImageDataset - TrainSet is created.
+2022-10-29 12:19:49,966 INFO: Training statistics:
+	Number of train images: 13711
+	Dataset enlarge ratio: 1
+	Batch size per gpu: 8
+	World size (gpu number): 1
+	Require iter number per epoch: 1714
+	Total epochs: 234; iters: 400000.
+2022-10-29 12:19:50,003 INFO: Dataset PairedImageDataset - ValSet is created.
+2022-10-29 12:19:50,003 INFO: Number of val images/folders in ValSet: 1200
+2022-10-29 12:19:50,004 INFO: Set pretrain_network_g to /home/weishao/Projects/CVPR_2022/wavelet-transformer/experiments/WaveletNet-Rain13k-width32_VanillaAttention_LocalConvNext_True/models/net_g_160000.pth
+2022-10-29 12:19:50,401 INFO: Loading WaveletNet model from /home/weishao/Projects/CVPR_2022/wavelet-transformer/experiments/WaveletNet-Rain13k-width32_VanillaAttention_LocalConvNext_True/models/net_g_160000.pth.
+2022-10-29 12:19:50,791 WARNING: Current net - loaded net:
+2022-10-29 12:19:50,791 WARNING: Loaded net - current net:
+2022-10-29 12:19:50,792 WARNING:   decoders.0.0.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,792 WARNING:   decoders.0.0.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,792 WARNING:   decoders.0.0.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,792 WARNING:   decoders.0.0.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,792 WARNING:   decoders.0.1.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,792 WARNING:   decoders.0.1.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,792 WARNING:   decoders.0.1.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,792 WARNING:   decoders.0.1.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,792 WARNING:   decoders.0.2.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,792 WARNING:   decoders.0.2.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,792 WARNING:   decoders.0.2.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,792 WARNING:   decoders.0.2.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,792 WARNING:   decoders.0.3.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,792 WARNING:   decoders.0.3.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,792 WARNING:   decoders.0.3.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,792 WARNING:   decoders.0.3.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,792 WARNING:   decoders.1.0.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,792 WARNING:   decoders.1.0.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,792 WARNING:   decoders.1.0.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,792 WARNING:   decoders.1.0.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,792 WARNING:   decoders.1.0.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,792 WARNING:   decoders.1.0.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,792 WARNING:   decoders.1.1.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,792 WARNING:   decoders.1.1.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,792 WARNING:   decoders.1.1.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,792 WARNING:   decoders.1.1.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,792 WARNING:   decoders.1.1.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,792 WARNING:   decoders.1.1.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,792 WARNING:   decoders.1.2.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,792 WARNING:   decoders.1.2.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,792 WARNING:   decoders.1.2.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,792 WARNING:   decoders.1.2.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,792 WARNING:   decoders.1.2.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,792 WARNING:   decoders.1.2.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,792 WARNING:   decoders.1.3.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,792 WARNING:   decoders.1.3.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,792 WARNING:   decoders.1.3.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,792 WARNING:   decoders.1.3.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,792 WARNING:   decoders.1.3.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,793 WARNING:   decoders.1.3.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.beta
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.conv1.bias
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.conv1.weight
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.conv2.bias
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.conv2.weight
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.conv3.bias
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.conv3.weight
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.conv4.bias
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.conv4.weight
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.conv5.bias
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.conv5.weight
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.gamma
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.norm1.bias
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.norm1.weight
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.norm2.bias
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.norm2.weight
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Attention.0.project_out.weight
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Attention.0.qkv.weight
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Attention.0.temperature
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Attention.1.project_out.weight
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Attention.1.qkv.weight
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Attention.1.temperature
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.DWT.0.w_hh
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.DWT.0.w_hl
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.DWT.0.w_lh
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.DWT.0.w_ll
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.DWT.1.w_hh
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.DWT.1.w_hl
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.DWT.1.w_lh
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.DWT.1.w_ll
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Global.to_out.to_out.0.bias
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Global.to_out.to_out.0.weight
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Global.to_out.to_qkvL.weight
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.IDWT.0.filters
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.IDWT.1.filters
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Local.0.to_out_1.dwconv.bias
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Local.0.to_out_1.dwconv.weight
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Local.0.to_out_1.gamma
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Local.0.to_out_1.norm.bias
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Local.0.to_out_1.norm.weight
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Local.0.to_out_1.pwconv1.bias
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Local.0.to_out_1.pwconv1.weight
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Local.0.to_out_1.pwconv2.bias
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Local.0.to_out_1.pwconv2.weight
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Local.0.to_out_2.dwconv.bias
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Local.0.to_out_2.dwconv.weight
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Local.0.to_out_2.gamma
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Local.0.to_out_2.norm.bias
+2022-10-29 12:19:50,793 WARNING:   decoders.1.4.sg1.Local.0.to_out_2.norm.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.0.to_out_2.pwconv1.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.0.to_out_2.pwconv1.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.0.to_out_2.pwconv2.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.0.to_out_2.pwconv2.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.0.to_out_3.dwconv.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.0.to_out_3.dwconv.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.0.to_out_3.gamma
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.0.to_out_3.norm.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.0.to_out_3.norm.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.0.to_out_3.pwconv1.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.0.to_out_3.pwconv1.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.0.to_out_3.pwconv2.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.0.to_out_3.pwconv2.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_1.dwconv.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_1.dwconv.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_1.gamma
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_1.norm.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_1.norm.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_1.pwconv1.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_1.pwconv1.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_1.pwconv2.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_1.pwconv2.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_2.dwconv.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_2.dwconv.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_2.gamma
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_2.norm.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_2.norm.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_2.pwconv1.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_2.pwconv1.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_2.pwconv2.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_2.pwconv2.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_3.dwconv.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_3.dwconv.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_3.gamma
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_3.norm.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_3.norm.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_3.pwconv1.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_3.pwconv1.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_3.pwconv2.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Local.1.to_out_3.pwconv2.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.4.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.5.beta
+2022-10-29 12:19:50,794 WARNING:   decoders.1.5.conv1.bias
+2022-10-29 12:19:50,794 WARNING:   decoders.1.5.conv1.weight
+2022-10-29 12:19:50,794 WARNING:   decoders.1.5.conv2.bias
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.conv2.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.conv3.bias
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.conv3.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.conv4.bias
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.conv4.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.conv5.bias
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.conv5.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.gamma
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.norm1.bias
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.norm1.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.norm2.bias
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.norm2.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Attention.0.project_out.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Attention.0.qkv.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Attention.0.temperature
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Attention.1.project_out.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Attention.1.qkv.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Attention.1.temperature
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.DWT.0.w_hh
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.DWT.0.w_hl
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.DWT.0.w_lh
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.DWT.0.w_ll
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.DWT.1.w_hh
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.DWT.1.w_hl
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.DWT.1.w_lh
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.DWT.1.w_ll
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Global.to_out.to_out.0.bias
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Global.to_out.to_out.0.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Global.to_out.to_qkvL.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.IDWT.0.filters
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.IDWT.1.filters
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_1.dwconv.bias
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_1.dwconv.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_1.gamma
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_1.norm.bias
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_1.norm.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_1.pwconv1.bias
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_1.pwconv1.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_1.pwconv2.bias
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_1.pwconv2.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_2.dwconv.bias
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_2.dwconv.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_2.gamma
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_2.norm.bias
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_2.norm.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_2.pwconv1.bias
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_2.pwconv1.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_2.pwconv2.bias
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_2.pwconv2.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_3.dwconv.bias
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_3.dwconv.weight
+2022-10-29 12:19:50,795 WARNING:   decoders.1.5.sg1.Local.0.to_out_3.gamma
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.0.to_out_3.norm.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.0.to_out_3.norm.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.0.to_out_3.pwconv1.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.0.to_out_3.pwconv1.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.0.to_out_3.pwconv2.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.0.to_out_3.pwconv2.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_1.dwconv.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_1.dwconv.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_1.gamma
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_1.norm.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_1.norm.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_1.pwconv1.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_1.pwconv1.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_1.pwconv2.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_1.pwconv2.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_2.dwconv.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_2.dwconv.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_2.gamma
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_2.norm.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_2.norm.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_2.pwconv1.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_2.pwconv1.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_2.pwconv2.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_2.pwconv2.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_3.dwconv.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_3.dwconv.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_3.gamma
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_3.norm.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_3.norm.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_3.pwconv1.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_3.pwconv1.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_3.pwconv2.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Local.1.to_out_3.pwconv2.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.1.5.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.2.0.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.2.0.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.2.0.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.2.0.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.2.0.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.2.0.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.2.0.sg1.Mix.3.conv.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.2.0.sg1.Mix.3.conv.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.2.1.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.2.1.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.2.1.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.2.1.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,796 WARNING:   decoders.2.1.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,796 WARNING:   decoders.2.1.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,797 WARNING:   decoders.2.1.sg1.Mix.3.conv.bias
+2022-10-29 12:19:50,797 WARNING:   decoders.2.1.sg1.Mix.3.conv.weight
+2022-10-29 12:19:50,797 WARNING:   decoders.2.2.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,797 WARNING:   decoders.2.2.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,797 WARNING:   decoders.2.2.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,797 WARNING:   decoders.2.2.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,797 WARNING:   decoders.2.2.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,797 WARNING:   decoders.2.2.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,797 WARNING:   decoders.2.2.sg1.Mix.3.conv.bias
+2022-10-29 12:19:50,797 WARNING:   decoders.2.2.sg1.Mix.3.conv.weight
+2022-10-29 12:19:50,797 WARNING:   decoders.2.3.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,797 WARNING:   decoders.2.3.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,797 WARNING:   decoders.2.3.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,797 WARNING:   decoders.2.3.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,797 WARNING:   decoders.2.3.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,797 WARNING:   decoders.2.3.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,797 WARNING:   decoders.2.3.sg1.Mix.3.conv.bias
+2022-10-29 12:19:50,797 WARNING:   decoders.2.3.sg1.Mix.3.conv.weight
+2022-10-29 12:19:50,797 WARNING:   decoders.2.4.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,797 WARNING:   decoders.2.4.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,797 WARNING:   decoders.2.4.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,797 WARNING:   decoders.2.4.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,797 WARNING:   decoders.2.4.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,797 WARNING:   decoders.2.4.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,797 WARNING:   decoders.2.4.sg1.Mix.3.conv.bias
+2022-10-29 12:19:50,797 WARNING:   decoders.2.4.sg1.Mix.3.conv.weight
+2022-10-29 12:19:50,797 WARNING:   decoders.2.5.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,797 WARNING:   decoders.2.5.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,797 WARNING:   decoders.2.5.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,797 WARNING:   decoders.2.5.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,797 WARNING:   decoders.2.5.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,797 WARNING:   decoders.2.5.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,797 WARNING:   decoders.2.5.sg1.Mix.3.conv.bias
+2022-10-29 12:19:50,797 WARNING:   decoders.2.5.sg1.Mix.3.conv.weight
+2022-10-29 12:19:50,797 WARNING:   encoders.0.0.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,797 WARNING:   encoders.0.0.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,797 WARNING:   encoders.0.0.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,797 WARNING:   encoders.0.0.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,797 WARNING:   encoders.0.0.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,797 WARNING:   encoders.0.0.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,797 WARNING:   encoders.0.0.sg1.Mix.3.conv.bias
+2022-10-29 12:19:50,797 WARNING:   encoders.0.0.sg1.Mix.3.conv.weight
+2022-10-29 12:19:50,797 WARNING:   encoders.0.1.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,797 WARNING:   encoders.0.1.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,797 WARNING:   encoders.0.1.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,797 WARNING:   encoders.0.1.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,797 WARNING:   encoders.0.1.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,797 WARNING:   encoders.0.1.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,797 WARNING:   encoders.0.1.sg1.Mix.3.conv.bias
+2022-10-29 12:19:50,797 WARNING:   encoders.0.1.sg1.Mix.3.conv.weight
+2022-10-29 12:19:50,797 WARNING:   encoders.0.2.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,797 WARNING:   encoders.0.2.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.0.2.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.0.2.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.0.2.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.0.2.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.0.2.sg1.Mix.3.conv.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.0.2.sg1.Mix.3.conv.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.0.3.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.0.3.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.0.3.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.0.3.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.0.3.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.0.3.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.0.3.sg1.Mix.3.conv.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.0.3.sg1.Mix.3.conv.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.1.0.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.1.0.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.1.0.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.1.0.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.1.0.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.1.0.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.1.1.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.1.1.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.1.1.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.1.1.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.1.1.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.1.1.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.1.2.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.1.2.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.1.2.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.1.2.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.1.2.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.1.2.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.1.3.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.1.3.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.1.3.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.1.3.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.1.3.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.1.3.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.1.4.beta
+2022-10-29 12:19:50,798 WARNING:   encoders.1.4.conv1.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.1.4.conv1.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.1.4.conv2.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.1.4.conv2.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.1.4.conv3.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.1.4.conv3.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.1.4.conv4.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.1.4.conv4.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.1.4.conv5.bias
+2022-10-29 12:19:50,798 WARNING:   encoders.1.4.conv5.weight
+2022-10-29 12:19:50,798 WARNING:   encoders.1.4.gamma
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.norm1.bias
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.norm1.weight
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.norm2.bias
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.norm2.weight
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Attention.0.project_out.weight
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Attention.0.qkv.weight
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Attention.0.temperature
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Attention.1.project_out.weight
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Attention.1.qkv.weight
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Attention.1.temperature
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.DWT.0.w_hh
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.DWT.0.w_hl
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.DWT.0.w_lh
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.DWT.0.w_ll
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.DWT.1.w_hh
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.DWT.1.w_hl
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.DWT.1.w_lh
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.DWT.1.w_ll
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Global.to_out.to_out.0.bias
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Global.to_out.to_out.0.weight
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Global.to_out.to_qkvL.weight
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.IDWT.0.filters
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.IDWT.1.filters
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_1.dwconv.bias
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_1.dwconv.weight
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_1.gamma
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_1.norm.bias
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_1.norm.weight
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_1.pwconv1.bias
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_1.pwconv1.weight
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_1.pwconv2.bias
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_1.pwconv2.weight
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_2.dwconv.bias
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_2.dwconv.weight
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_2.gamma
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_2.norm.bias
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_2.norm.weight
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_2.pwconv1.bias
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_2.pwconv1.weight
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_2.pwconv2.bias
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_2.pwconv2.weight
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_3.dwconv.bias
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_3.dwconv.weight
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_3.gamma
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_3.norm.bias
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_3.norm.weight
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_3.pwconv1.bias
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_3.pwconv1.weight
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_3.pwconv2.bias
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.0.to_out_3.pwconv2.weight
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.1.to_out_1.dwconv.bias
+2022-10-29 12:19:50,799 WARNING:   encoders.1.4.sg1.Local.1.to_out_1.dwconv.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_1.gamma
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_1.norm.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_1.norm.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_1.pwconv1.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_1.pwconv1.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_1.pwconv2.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_1.pwconv2.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_2.dwconv.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_2.dwconv.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_2.gamma
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_2.norm.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_2.norm.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_2.pwconv1.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_2.pwconv1.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_2.pwconv2.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_2.pwconv2.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_3.dwconv.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_3.dwconv.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_3.gamma
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_3.norm.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_3.norm.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_3.pwconv1.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_3.pwconv1.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_3.pwconv2.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Local.1.to_out_3.pwconv2.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.4.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.beta
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.conv1.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.conv1.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.conv2.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.conv2.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.conv3.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.conv3.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.conv4.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.conv4.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.conv5.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.conv5.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.gamma
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.norm1.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.norm1.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.norm2.bias
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.norm2.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.sg1.Attention.0.project_out.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.sg1.Attention.0.qkv.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.sg1.Attention.0.temperature
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.sg1.Attention.1.project_out.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.sg1.Attention.1.qkv.weight
+2022-10-29 12:19:50,800 WARNING:   encoders.1.5.sg1.Attention.1.temperature
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.DWT.0.w_hh
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.DWT.0.w_hl
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.DWT.0.w_lh
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.DWT.0.w_ll
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.DWT.1.w_hh
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.DWT.1.w_hl
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.DWT.1.w_lh
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.DWT.1.w_ll
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Global.to_out.to_out.0.bias
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Global.to_out.to_out.0.weight
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Global.to_out.to_qkvL.weight
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.IDWT.0.filters
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.IDWT.1.filters
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_1.dwconv.bias
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_1.dwconv.weight
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_1.gamma
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_1.norm.bias
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_1.norm.weight
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_1.pwconv1.bias
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_1.pwconv1.weight
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_1.pwconv2.bias
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_1.pwconv2.weight
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_2.dwconv.bias
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_2.dwconv.weight
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_2.gamma
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_2.norm.bias
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_2.norm.weight
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_2.pwconv1.bias
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_2.pwconv1.weight
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_2.pwconv2.bias
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_2.pwconv2.weight
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_3.dwconv.bias
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_3.dwconv.weight
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_3.gamma
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_3.norm.bias
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_3.norm.weight
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_3.pwconv1.bias
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_3.pwconv1.weight
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_3.pwconv2.bias
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.0.to_out_3.pwconv2.weight
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.1.to_out_1.dwconv.bias
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.1.to_out_1.dwconv.weight
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.1.to_out_1.gamma
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.1.to_out_1.norm.bias
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.1.to_out_1.norm.weight
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.1.to_out_1.pwconv1.bias
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.1.to_out_1.pwconv1.weight
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.1.to_out_1.pwconv2.bias
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.1.to_out_1.pwconv2.weight
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.1.to_out_2.dwconv.bias
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.1.to_out_2.dwconv.weight
+2022-10-29 12:19:50,801 WARNING:   encoders.1.5.sg1.Local.1.to_out_2.gamma
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Local.1.to_out_2.norm.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Local.1.to_out_2.norm.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Local.1.to_out_2.pwconv1.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Local.1.to_out_2.pwconv1.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Local.1.to_out_2.pwconv2.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Local.1.to_out_2.pwconv2.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Local.1.to_out_3.dwconv.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Local.1.to_out_3.dwconv.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Local.1.to_out_3.gamma
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Local.1.to_out_3.norm.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Local.1.to_out_3.norm.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Local.1.to_out_3.pwconv1.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Local.1.to_out_3.pwconv1.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Local.1.to_out_3.pwconv2.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Local.1.to_out_3.pwconv2.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Mix.2.conv.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.1.5.sg1.Mix.2.conv.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.2.0.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.2.0.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.2.0.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.2.0.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.2.1.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.2.1.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.2.1.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.2.1.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.2.2.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.2.2.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.2.2.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.2.2.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.2.3.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.2.3.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.2.3.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.2.3.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.2.4.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.2.4.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.2.4.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.2.4.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.2.5.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.2.5.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,802 WARNING:   encoders.2.5.sg1.Mix.1.conv.bias
+2022-10-29 12:19:50,802 WARNING:   encoders.2.5.sg1.Mix.1.conv.weight
+2022-10-29 12:19:50,802 WARNING:   middle_blks.0.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,802 WARNING:   middle_blks.0.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,802 WARNING:   middle_blks.1.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,802 WARNING:   middle_blks.1.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,802 WARNING:   middle_blks.2.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,802 WARNING:   middle_blks.2.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,802 WARNING:   middle_blks.3.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,803 WARNING:   middle_blks.3.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,803 WARNING:   middle_blks.4.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,803 WARNING:   middle_blks.4.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,803 WARNING:   middle_blks.5.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,803 WARNING:   middle_blks.5.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,803 WARNING:   middle_blks.6.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,803 WARNING:   middle_blks.6.sg1.Mix.0.conv.weight
+2022-10-29 12:19:50,803 WARNING:   middle_blks.7.sg1.Mix.0.conv.bias
+2022-10-29 12:19:50,803 WARNING:   middle_blks.7.sg1.Mix.0.conv.weight
